@@ -50,8 +50,6 @@ if(_x_offset == 0 && _y_offset == 0) {
 last_x_offset = _x_offset;
 last_y_offset = _y_offset;
 
-show_debug_message(last_x_offset, last_y_offset);
-
 var _interactable_instance = collision_line(x, y, x + _x_offset, y + _y_offset, obj_trigger_interactable, false, true);
 if(can_interact() && _interactable_instance && check_confirm_pressed()) {
 	with(_interactable_instance){event_user(0);};

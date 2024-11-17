@@ -1,6 +1,24 @@
 global.dialogues = [
 	{
-		text : "It’s Toriel's diary.//read the circled passage?",
+		text : "This is a testing dialogue.//This text is white,<color #FF0000>now it's red,<color #0000FF>now blue,</color>and red again,</color>ending in white.",
+		font : fnt_default,
+		txt_speed : 0.7,
+		next : undefined,
+		item : undefined,
+		play : false,
+		sound : undefined,
+		loop : undefined,
+		characters : [undefined, undefined],
+		emotions : [],
+		option1 : undefined,
+		option2 : undefined,
+		auto : false,
+		voices : [sfx_talk_def, sfx_talk_def],
+		colors : [],
+		effects : []
+	},
+	{
+		text : "It’s <color #FF00AA>Toriel's</color> diary.//read the circled passage?",
 		font : fnt_default,
 		txt_speed : 0.7,
 		next : undefined,

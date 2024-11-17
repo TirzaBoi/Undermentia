@@ -34,7 +34,6 @@ function display_dialogue_textbox(_num, _textbox){
 	_textbox.play = dialogue.play;
 	_textbox.sound = dialogue.sound;
 	_textbox.loop = dialogue.loop;
-	show_debug_message(dialogue);
 	_textbox.characters = dialogue.characters;
 	_textbox.emotions = dialogue.emotions;
 	_textbox.text_lenght = string_length(dialogue.text);

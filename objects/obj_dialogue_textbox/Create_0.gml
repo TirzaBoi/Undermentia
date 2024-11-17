@@ -22,11 +22,7 @@ loop = undefined;
 options = [undefined, undefined];
 auto = false;
 voice = sfx_talk_def;
-colors[0] = {
-	col : #ffffff,
-	start : 0,
-	end_pos : 999
-};
+colors = [];
 color_char[0, 0] = #ffffff;
 
 effects[0] = {
@@ -61,4 +57,51 @@ snd_count = snd_delay;
 if(object_exists(obj_player)) {
 	obj_player.can_move = false;
 	obj_player.in_dialogue = true;
+}
+
+tag_stack = [];
+tag_start_stack = [];
+tag_lenght_stack = [];
+
+function hexcolor_convert(_hexcolor) {
+    var _str = string_replace(_hexcolor,"#","");
+    var _color = 0,
+        _i = 1,
+        _value;
+    static hex2ord = function(_character) {
+        var _a = ord(_character) - 48;
+        if(_a < 0 || clamp(_a, 58 - 48, 64 - 48) == _a || clamp(_a, 71 - 48, 96 - 48) == _a || _a > 102 - 48) {
+            return undefined
+		}
+        return _a < 10 ? _a : (_a < 23 ? _a - 7 : _a - 39);
+    }   
+    repeat string_length(_str) {
+        _value = hex2ord(string_char_at(_str,_i++));
+        if(_value != undefined) {
+            _color = _color * 16 + _value;
+		} else {
+			break;
+		}
+    }
+
+    if string_starts_with(_hexcolor,"#") {
+        _value = (_color & 255) << 16 | (_color & $ff00);
+        _color = _color >> 16 | _value;
+    }
+	
+	return _color;
+}
+
+function process_tag(_end_index, _page, _start_tag, _start_index, _start_lenght) {
+	switch(_start_tag[0]) {
+		case "color":
+			var _color = hexcolor_convert(_start_tag[1]);
+			array_insert(colors, 0, {
+				start : _start_index,
+				col : _color,
+				end_pos : _end_index - 2,
+				page : _page
+			});
+			break;
+	}
 }
