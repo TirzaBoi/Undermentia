@@ -38,6 +38,7 @@
     {"$GMFolder":"","%Name":"Timelines","folderPath":"folders/Timelines.yy","name":"Timelines","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
   "IncludedFiles":[
+    {"$GMIncludedFile":"","%Name":"csv_placeholder.csv","CopyToMask":-1,"filePath":"datafiles","name":"csv_placeholder.csv","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"DTM-Mono.otf","CopyToMask":-1,"filePath":"datafiles","name":"DTM-Mono.otf","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
   "isEcma":false,

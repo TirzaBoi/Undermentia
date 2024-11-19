@@ -174,3 +174,25 @@ function get_dialogue(_dialogue_id){
 	dia = global.dialogues[_dialogue_id];
 	return dia;
 }
+
+function get_dialogue_csv(_name) {
+	var _y = 0;
+	ds_table = load_csv("csv_placeholder.csv");
+	/*  for multi-language support
+	if(lang == "en") {
+		curr_ds_table = ds_table_en;
+	} else if(lang == "jp") {
+	curr_ds_table = ds_table_ja;
+	}
+	*/
+
+	if (ds_grid_value_exists(ds_table, 0, 0, 0, ds_grid_height(ds_table), _name)) {
+   		_y = ds_grid_value_y(ds_table, 0, 0, 0, ds_grid_height(ds_table), _name);
+	}
+	var _array = [];
+	for(var _i = 0; _i < ds_grid_width(ds_table); _i++) {
+		_array[_i] = ds_grid_get(ds_table, _i, _y);
+	}
+
+	return _array;
+}
