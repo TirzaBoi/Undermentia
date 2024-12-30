@@ -18,7 +18,7 @@ eq_weap = global.item_list.stick.name; // equipped weapon name
 #region Movement & Collision 
 
 can_player_interact = true
-movement_speed = 100;
+movement_speed = 1.5;
 is_moving = false;
 dir = 0; 
 enum DIRECTION {
@@ -28,10 +28,12 @@ enum DIRECTION {
 	UP
 }	
 
+slopes_hit = ds_list_create();
+
 collided_trigger = undefined; // Stores a reference to a trigger object you are looking at
 collided_length = 20; // Defines how far away you can grab a trigger object's reference
 trigger_map = layer_tilemap_get_id("Triggers");
-collision_map = layer_tilemap_get_id("Collision");
+//collision_map = layer_tilemap_get_id("Collision");
 
 #endregion
 

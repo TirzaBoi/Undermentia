@@ -1,12 +1,15 @@
 /// @description
 
-var _delta = delta_time / 1000000;
+// delta time is not needed since this isn't computationally expensive and should always run at full speed
+//var _delta = delta_time / 1000000;
+
 var _move_x = keyboard_check(vk_right) - keyboard_check(vk_left);
 var _move_y = keyboard_check(vk_down) - keyboard_check(vk_up);
 
-var _new_x = x + (_move_x * movement_speed * _delta);
-var _new_y = y + (_move_y * movement_speed * _delta);
-
+//var _new_x = x + (_move_x * movement_speed * _delta);
+//var _new_y = y + (_move_y * movement_speed * _delta);
+var _delta_x = _move_x * movement_speed;
+var _delta_y = _move_y * movement_speed;
 
 // stops player from moving when menu is open
 if (global.menu_open) {
@@ -16,15 +19,40 @@ if (global.menu_open) {
 
 #region Movement
 
-
-/* This collision is not ideal at all, but it works well enough for what we need right now.
- * Inefficient, but basic and snappy. We can overhaul it later! */
- 
 if (can_player_interact) {
-	if (!place_meeting(_new_x, y, collision_map)) x = _new_x;
-	if (!place_meeting(x, _new_y, collision_map)) y = _new_y;
+	x+=_delta_x;
+	if(place_meeting(x,y,obj_col)){
+		x=round(x); // just in case anyone adds back delta
+		while(place_meeting(x,y,obj_col)){
+			x-=sign(_delta_x);
+		}
+	}else{
+		if(place_meeting(x,y,obj_slope)){
+			if(!place_meeting(x,y-ceil(movement_speed),obj_slope)){
+				y-=ceil(movement_speed);
+			}else if(!place_meeting(x,y+ceil(movement_speed),obj_slope)){
+				y+=ceil(movement_speed);
+			}
+		}
+	}
+	
+	y+=_delta_y;
+	if(place_meeting(x,y,obj_col)){
+		y=round(y); // just in case anyone adds back delta
+		while(place_meeting(x,y,obj_col)){
+			y-=sign(_delta_y);
+		}
+	}else{
+		if(place_meeting(x,y,obj_slope)){
+			if(!place_meeting(x-ceil(movement_speed),y,obj_slope)){
+				x-=ceil(movement_speed);
+			}else if(!place_meeting(x+ceil(movement_speed),y,obj_slope)){
+				x+=ceil(movement_speed);
+			}
+		}
+	}
+	
 }
-
 
 if (keyboard_check(vk_tab)) {
 	fade_screen(1, #ffffff, 0.5);	

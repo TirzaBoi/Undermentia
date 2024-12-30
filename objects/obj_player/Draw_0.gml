@@ -1,3 +1,4 @@
+depth = -y;
 // Sets the current animation
 image_index = anim_bind(image_index, animation_frames);
 sprite_set_speed(sprite_index, animation_speed, spritespeed_framespersecond);

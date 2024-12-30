@@ -1,0 +1,8 @@
+enum SLOPE_TYPES{
+	SLOPE_TYPE_TL,
+	SLOPE_TYPE_TR,
+	SLOPE_TYPE_BL,
+	SLOPE_TYPE_BR
+};
+
+my_type = 0;

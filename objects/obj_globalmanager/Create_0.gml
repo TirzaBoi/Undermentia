@@ -63,24 +63,24 @@ save = function()
 move_player_to_safe_pos = function()
 {
 	// Player is at unsafe pos if they're on an invalid tile on the set or on a collision tile
-	var tileset_tile_id = tilemap_get_at_pixel(layer_tilemap_get_id("Tileset"), obj_player.x, obj_player.y);
-	var collision_tile_id = tilemap_get_at_pixel(layer_tilemap_get_id("Collision"), obj_player.x, obj_player.y);
+	//var tileset_tile_id = tilemap_get_at_pixel(layer_tilemap_get_id("Tileset"), obj_player.x, obj_player.y);
+	//var collision_tile_id = tilemap_get_at_pixel(layer_tilemap_get_id("Collision"), obj_player.x, obj_player.y);
 	
-	var is_on_map = tileset_tile_id != 0;
-	var is_in_collision = collision_tile_id != 0;
+	//var is_on_map = tileset_tile_id != 0;
+	//var is_in_collision = collision_tile_id != 0;
 	
-	if !is_on_map || is_in_collision 
-	{
-		var old_x = obj_player.x;
-		var old_y = obj_player.y;
+	//if !is_on_map || is_in_collision 
+	//{
+		//var old_x = obj_player.x;
+		//var old_y = obj_player.y;
 		
 		var new_x = obj_player_spawn.x;
 		var new_y = obj_player_spawn.y;
 		obj_player.x = new_x;
 		obj_player.y = new_y;
 		
-		show_debug_message($"[DEBUG] Moved player to new safe position, now at: {obj_player.x}, {obj_player.y} from {old_x}, {old_y}");
-	}
+		//show_debug_message($"[DEBUG] Moved player to new safe position, now at: {obj_player.x}, {obj_player.y} from {old_x}, {old_y}");
+	//}
 }
 
 create_empty_savedata = function() 
