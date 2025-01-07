@@ -1,7 +1,7 @@
 global.dialogues = [
 	{
 		text : "This is a testing dialogue.//This text is white,<color #FF0000>now it's red,<color #0000FF>now blue,</color>and red again,</color>ending in white.",
-		font : fnt_default,
+		font : fnt_undertale,
 		txt_speed : 0.7,
 		next : undefined,
 		item : undefined,
@@ -19,7 +19,7 @@ global.dialogues = [
 	},
 	{
 		text : "It’s <color #FF00AA>Toriel's</color> diary.//read the circled passage?",
-		font : fnt_default,
+		font : fnt_undertale,
 		txt_speed : 0.7,
 		next : undefined,
 		item : undefined,
@@ -43,7 +43,7 @@ global.dialogues = [
 	},
 	{
 		text : "You read the passage one. “Why did the skeleton want a friend? Because she was feeling BONELY!” The rest of the diary is filled with jokes with the same caliber",
-		font : fnt_default,
+		font : fnt_undertale,
 		txt_speed : 0.7,
 		next : undefined,
 		item : undefined,
@@ -61,7 +61,7 @@ global.dialogues = [
 	},
 	{
 		text : "",
-		font : fnt_default,
+		font : fnt_undertale,
 		txt_speed : 0.7,
 		next : undefined,
 		item : undefined,
@@ -79,7 +79,7 @@ global.dialogues = [
 	},
 	{
 		text : "Howdy! I'm Flowey. Flowey the Flower!//You're new to the underground, aren't cha?//Golly, you must be so confused.//Someone better teach you how things work around here.//I guess little old me will have to do.//Ready? Here we go!",
-		font : fnt_default,
+		font : fnt_undertale,
 		txt_speed : 0.7,
 		next : 1,
 		item : undefined,
@@ -97,7 +97,7 @@ global.dialogues = [
 	},
 	{
 		text : "HOWDY! I'm Flowey! Flowey the Flower.//Teehee, I know what you did there.//You killed her.//And you regret it so you reset!//You think you can get away from me with anything you do?//You’ve gotta try harder than that buddy.",
-		font : fnt_default,
+		font : fnt_undertale,
 		txt_speed : 0.7,
 		next : 2,
 		item : undefined,
@@ -115,7 +115,7 @@ global.dialogues = [
 	},
 	{
 		text : "Seriously?! I thought you were finally seeing things my way.//We could have had so much fun burning this world down together, then you chickened out.",
-		font : fnt_default,
+		font : fnt_undertale,
 		txt_speed : 0.7,
 		next : 3,
 		item : undefined,
@@ -133,7 +133,7 @@ global.dialogues = [
 	},
 	{
 		text : "HOWDY! I'm Flowey! Flowey the Flower.//Huh? Why did you make me introduce myself?//Teehee, it’s rude to act like you don’t know me.//Someone ought to teach you how to use manners.",
-		font : fnt_default,
+		font : fnt_undertale,
 		txt_speed : 0.7,
 		next : 4,
 		item : undefined,
@@ -151,7 +151,7 @@ global.dialogues = [
 	},
 	{
 		text : "Don’t you have anything better to do?",
-		font : fnt_default,
+		font : fnt_undertale,
 		txt_speed : 0.7,
 		next : undefined,
 		item : undefined,

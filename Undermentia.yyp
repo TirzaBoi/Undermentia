@@ -34,9 +34,9 @@
     {"$GMFolder":"","%Name":"Sprites","folderPath":"folders/Sprites.yy","name":"Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Characters","folderPath":"folders/Sprites/Characters.yy","name":"Characters","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Flags","folderPath":"folders/Sprites/Flags.yy","name":"Flags","resourceType":"GMFolder","resourceVersion":"2.0",},
-    {"$GMFolder":"","%Name":"Portraits","folderPath":"folders/Sprites/Portraits.yy","name":"Portraits","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"GUI Sprites","folderPath":"folders/Sprites/GUI Sprites.yy","name":"GUI Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Inventory","folderPath":"folders/Sprites/Inventory.yy","name":"Inventory","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Portraits","folderPath":"folders/Sprites/Portraits.yy","name":"Portraits","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Tile Sets","folderPath":"folders/Sprites/Tile Sets.yy","name":"Tile Sets","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Tile Sets","folderPath":"folders/Tile Sets.yy","name":"Tile Sets","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Timelines","folderPath":"folders/Timelines.yy","name":"Timelines","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -53,7 +53,6 @@
   },
   "name":"Undermentia",
   "resources":[
-    {"id":{"name":"fnt_default","path":"fonts/fnt_default/fnt_default.yy",},},
     {"id":{"name":"fnt_papyrus","path":"fonts/fnt_papyrus/fnt_papyrus.yy",},},
     {"id":{"name":"fnt_sans","path":"fonts/fnt_sans/fnt_sans.yy",},},
     {"id":{"name":"fnt_undertale","path":"fonts/fnt_undertale/fnt_undertale.yy",},},
