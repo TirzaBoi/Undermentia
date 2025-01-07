@@ -1,3 +1,3 @@
 function interact() {
-	display_dialogue(0);
+	display_dialogue("Test", self);
 }

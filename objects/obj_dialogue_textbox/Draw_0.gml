@@ -1,10 +1,14 @@
 /// @description Drawing the textbox
 x = camera_get_view_x(view_camera[0]) + pos_x;
 y = camera_get_view_y(view_camera[0]) + pos_y;
+image_xscale = background_width / 32;
+image_yscale = background_height / 32;
 
 if(!setup) {
 	setup = true;
-	draw_set_font(font);
+	base_text_speed = text_speed;
+	base_font = font[0, 0];
+	draw_set_font(base_font);
 	draw_set_halign(fa_left);
 	draw_set_valign(fa_top);
 	
@@ -36,12 +40,17 @@ if(!setup) {
 	
 	var _delete_stack = [];
 	var _total_text_shortage = 0;
+	var _processed_end_tags = 0;
+	tag_stack = [];
+	tag_index_stack = [];
+	tag_lenght_stack = [];
+	tag_start_stack = [];
 	for(var _page = 0; _page <= num_pages; _page++) {
 		for(var _c = 0; _c < text_lenghts[_page]; _c++) {
 			var _char = string_char_at(texts[_page], _c + 1);
 			if(_char == "<") {
 				var _end_pos = _c + 1;
-				for(var _i = _end_pos; _i < text_lenghts[_page]; _i++) {
+				for(var _i = _end_pos; _i <= text_lenghts[_page]; _i++) {
 					var _ic = string_char_at(texts[_page], _i);
 					_end_pos = _i;
 					if(_ic == ">") {
@@ -56,18 +65,20 @@ if(!setup) {
 					var _start_tag = [];
 					var _start = 0;
 					var _len = 0;
-					for(var _i = array_length(tag_stack) - 1; _i >= 0; _i--;) {
+					for(var _i = array_length(tag_stack) - 1; _i >= 0; _i--) {
 						var _tag = tag_stack[_i];
 						_start_tag = _tag;
 						_start = tag_start_stack[_i];
 						_len = tag_lenght_stack[_i];
 						if(_tag[0] == _parts[0]) {
+							var _pos = tag_index_stack[_i];
 							array_delete(tag_stack, _i, 1);
+							array_delete(tag_index_stack, _i, 1);
 							array_delete(tag_start_stack, _i, 1);
 							
 							var _real_c = _c;
 							for(var _j = 0; _j < array_length(tag_lenght_stack) - 1; _j++) {
-								if(_j < _i) {
+								if(_j < _pos) {
 									_start -= tag_lenght_stack[_j];
 								}
 								_real_c -= tag_lenght_stack[_j];
@@ -78,6 +89,7 @@ if(!setup) {
 					}
 				} else {
 					tag_stack[array_length(tag_stack)] = _parts;
+					tag_index_stack[array_length(tag_index_stack)] = array_length(tag_index_stack);
 					tag_start_stack[array_length(tag_start_stack)] = _c;
 				}
 				_total_text_shortage += _end_pos - _c;
@@ -86,20 +98,20 @@ if(!setup) {
 		}
 		for(var _x = array_length(tag_stack) - 1; _x >= 0; _x--;) {
 			var _start_tag = tag_stack[_x];
+			var _index = tag_index_stack[_x];
 			var _start = tag_start_stack[_x];
 			var _len = tag_lenght_stack[_x];
 			
 			array_delete(tag_stack, _x, 1);
+			array_delete(tag_index_stack, _x, 1);
 			array_delete(tag_start_stack, _x, 1);
 							
-			var _real_c = _x;
 			for(var _j = 0; _j < array_length(tag_lenght_stack) - 1; _j++) {
-				if(_j < _x) {
+				if(_j < _index) {
 					_start -= tag_lenght_stack[_j];
 				}
-				_real_c -= tag_lenght_stack[_j];
 			}
-			process_tag(_real_c + 1, _page, _start_tag, _start, _len);
+			process_tag(text_lenghts[_page], _page, _start_tag, _start, _len);
 			break;
 		}
 		for(var _t = array_length(_delete_stack) - 1; _t >= 0; _t--) {
@@ -112,22 +124,9 @@ if(!setup) {
 	}
 	
 	for(var _page = 0; _page <= num_pages; _page++) {
-		last_free_space = 0;
-		break_nums[_page] = 0;
-		break_offset = 0;
 		for(var _c = 0; _c < text_lenghts[_page]; _c++) {
-			var _txt_w = string_width(string_copy(texts[_page], 1, _c + 1)) - string_width(chars[_page, _c]);
-		
-			if(chars[_page, _c] == " ") {
-				last_free_space = _c + 1;
-			}
-				
-			if(_txt_w - break_offset > background_width - (margin_x * 2) - (characters[_page] != undefined ? 64 + margin_x : 0)) {
-				line_breaks[break_nums[_page], _page] = last_free_space;
-				break_nums[_page]++;
-				break_offset = string_width(string_copy(texts[_page], 1, last_free_space)) - string_width(string_char_at(texts[_page], last_free_space));
-			}
-		
+			calculate_letter_positions(_page);
+			
 			color_char[_c, _page] = #ffffff;
 			for(var _i = 0; _i < array_length(colors); _i++) {
 				if(colors[_i].page == _page) {
@@ -136,35 +135,60 @@ if(!setup) {
 			}
 
 			effect_char[_c, _page] = [];
-			effect_char_params[_c, _page] = [];
+			effect_char_params[_c, _page] = {};
 			for(var _i = 0; _i < array_length(effects); _i++) {
-				if(effects[_i].start <= _c && effects[_i].end_pos >= _c) {
-					array_insert(effect_char[_c, _page], array_length(effect_char[_c, _page]), effects[_i].effect);
-					array_insert(effect_char_params[_c, _page], array_length(effect_char_params[_c, _page]), effects[_i].params);
+				if(effects[_i].page == _page) {
+					if(effects[_i].start <= _c && effects[_i].end_pos >= _c) {
+						if(!array_contains(effect_char[_c, _page], effects[_i].effect)) {
+							array_insert(effect_char[_c, _page], array_length(effect_char[_c, _page]), effects[_i].effect);
+						}
+						switch(effects[_i].effect) {
+							case "shake":
+								effect_char_params[_c, _page].shake = effects[_i].params;
+								break;
+							case "portrait":
+								effect_char_params[_c, _page].portrait = effects[_i].params;
+								break;
+							case "text_speed":
+								effect_char_params[_c, _page].text_speed = effects[_i].params;
+								break;
+							case "play_sound":
+								effect_char_params[_c, _page].play_sound = effects[_i].params;
+								break;
+							case "item":
+								effect_char_params[_c, _page].item = effects[_i].params;
+								break;
+							case "event":
+								if(effects[_i].start == _c) {
+									effect_char_params[_c, _page].evento = effects[_i].params;
+								} else {
+									array_delete(effect_char[_c, _page], array_length(effect_char[_c, _page]) - 1, 1)
+								}
+								break;
+							case "options":
+								effect_char_params[_c, _page].options = effects[_i].params;
+								break;
+							case "auto":
+								effect_char_params[_c, _page].auto = effects[_i].params;
+								break;
+							case "textbox":
+								effect_char_params[_c, _page].textbox = effects[_i].params;
+								break;
+							case "wait":
+								effect_char_params[_c, _page].wait = effects[_i].params;
+								break;
+							case "font":
+								effect_char_params[_c, _page].font = effects[_i].params;
+								break;
+						}
+					}
 				}
 			}
 		}
 	}
 	
 	for(var _page = 0; _page <= num_pages; _page++) {
-		for(var _c = 0; _c < text_lenghts[_page]; _c++) {
-			var _txt_x = (background_width / 2) - (characters[page] != undefined ? 64 + margin_x : 0) - margin_x;
-			var _txt_y = (background_height / 2) - margin_y;
-			
-			var _txt_w = string_width(string_copy(texts[_page], 1, _c + 1)) - string_width(chars[_page, _c]);
-			var _line = 0;
-		
-			for(var _b = 0; _b < break_nums[_page]; _b++) {
-				if(_c + 1 > line_breaks[_b, _page]) {
-					var _copy = string_copy(texts[_page], line_breaks[_b, _page], _c + 1 - line_breaks[_b, _page]);
-					_txt_w = string_width(_copy);
-					_line = _b + 1;
-				}
-			}
-		
-			char_x[_c, _page] = _txt_x - _txt_w;
-			char_y[_c, _page] = _txt_y - (line_separation * _line);
-		}
+		set_letter_positions(_page);
 	}
 }
 
@@ -175,14 +199,14 @@ if(text_index < text_lenghts[page] && txt_timer <= 0) {
 	
 	if(snd_count < snd_delay) {
 		snd_count++;
-	} else {
+	} else if(last_char != floor(text_index)) {
 		snd_count = 0;
 		audio_play_sound(voices[page], 0, false);
 	}
 	
 	var _curr_char = string_char_at(texts[page], text_index + 1);
 	
-	if(_curr_char == "." || _curr_char == "," || _curr_char == "?" || _curr_char == "!") {
+	if(inter_wait && (_curr_char == "." || _curr_char == "," || _curr_char == "?" || _curr_char == "!")) {
 		txt_timer = txt_wait_time;
 	}
 } else if(text_index < text_lenghts[page] && txt_timer > 0) {
@@ -190,22 +214,17 @@ if(text_index < text_lenghts[page] && txt_timer <= 0) {
 	txt_timer--;
 } else if(check_confirm_pressed() || auto) {
 	if(page >= num_pages) {
-		if(play) {
-			//remaking after audio manager
-			if(sound != undefined) {
-				audio_play_sound(sound, 1, loop);
-			} else {
-				audio_stop_all();
-			}
-		}
 		if(next == undefined) {
-			if(options[0] == undefined) {
+			if(array_length(options) <= 0) {
 				if(object_exists(obj_player)) {
 					obj_player.in_dialogue = false;
 					obj_player.can_move = true;
 				}
 				instance_destroy();
 			} else {
+				if(caller != undefined && variable_instance_exists(caller, "dialogue_message_cache")) {
+					array_insert(caller.dialogue_message_cache, array_length(caller.dialogue_message_cache), option);
+				}
 				text_index = 0;
 				setup = false;
 				line_breaks = [];
@@ -217,7 +236,10 @@ if(text_index < text_lenghts[page] && txt_timer <= 0) {
 				char_y = [];
 				num_pages = 0;
 				page = 0;
-				display_dialogue_textbox(options[option].next, self);
+				effects = [];
+				colors = [];
+				display_dialogue_textbox(options[option].next, self, caller);
+				options = [];
 			}
 		} else {
 			text_index = 0;
@@ -231,33 +253,138 @@ if(text_index < text_lenghts[page] && txt_timer <= 0) {
 			char_y = [];
 			num_pages = 0;
 			page = 0;
-			display_dialogue_textbox(next, self);
+			effects = [];
+			colors = [];
+			display_dialogue_textbox(next, self, caller);
+			options = [];
 		}
 	} else {
 		text_index = 0;
 		page++;
 	}
 }
+last_char = floor(text_index);
 
 draw_self();
 
 for(var _c = 0; _c < min(text_index, text_lenghts[page]); _c++) {
 	var _c_clamped = min(_c, text_index);
-	var _x_offset = (array_contains(effect_char[_c, page], "shake") ? random_range(-1, 1) : 0) * 1.3;
-	var _y_offset = (array_contains(effect_char[_c, page], "shake") ? random_range(-1, 1) : 0) * 1.3;
+	var _x_offset = 0;
+	var _y_offset = 0;
+	
+	font[_c, page] = base_font;
+	size = base_size;
+	if(array_length(effect_char[_c, page]) != 0) {
+		for(var _i = 0; _i < array_length(effect_char[_c, page]); _i++) {
+			if(array_contains(effect_char[text_index - 1, page], "text_speed")) {
+				text_speed = effect_char_params[text_index - 1, page].text_speed;
+			} else {
+				text_speed = base_text_speed;
+			}
+			if(effect_char[_c, page][_i] == "shake") {
+				_x_offset = random_range(-1, 1) * effect_char_params[_c, page].shake;
+				_y_offset = random_range(-1, 1) * effect_char_params[_c, page].shake;
+			}
+			if(effect_char[_c, page][_i] == "font") {
+				font[_c, page] = effect_char_params[_c, page].font[0];
+				size = effect_char_params[_c, page].font[1];
+			}
+			if(effect_char[_c, page][_i] == "event") {
+				if(caller != undefined && variable_instance_exists(caller, "dialogue_message_cache")) {
+					array_insert(caller.dialogue_message_cache, array_length(caller.dialogue_message_cache), effect_char_params[_c, page].evento[0]);
+				}
+				array_delete(effect_char[_c, page], _i, 1);
+			}
+			if(array_contains(effect_char[text_index - 1, page], "auto")) {
+				auto = effect_char_params[text_index - 1, page].auto;
+			}
+			if(array_contains(effect_char[_c, page], "options") && array_length(options) == 0) {
+				var _array = [];
+				array_copy(_array, 0, effect_char_params[text_index - 1, page].options, 1, array_length(effect_char_params[text_index - 1, page].options) - 1);
+				for(var _j = 0; _j <= array_length(_array) - 1; _j += 2) {
+					array_insert(options, array_length(options), {text : _array[_j], next : _array[_j + 1]});
+				}
+			}
+			if(array_contains(effect_char[text_index - 1, page], "wait")) {
+				inter_wait = effect_char_params[text_index - 1, page].wait;
+			}
+			if(array_contains(effect_char[text_index - 1, page], "portrait")) {
+				character = effect_char_params[text_index - 1, page].portrait[0];
+				emotion = effect_char_params[text_index - 1, page].portrait[1];
+			} else {
+				character = undefined;
+			}
+			if(array_contains(effect_char[text_index - 1, page], "textbox")) {
+				image_index = effect_char_params[text_index - 1, page].textbox[0];
+				if(effect_char_params[text_index - 1, page].textbox[1] != undefined) {
+					pos_x = effect_char_params[text_index - 1, page].textbox[1];
+					pos_y = effect_char_params[text_index - 1, page].textbox[2];
+				}
+				if(effect_char_params[text_index - 1, page].textbox[3] != undefined) {
+					background_width = effect_char_params[text_index - 1, page].textbox[3];
+					background_height = effect_char_params[text_index - 1, page].textbox[4];
+				}
+			}
+		}
+		calculate_letter_positions(page);
+		set_letter_positions(page);
+	}
 	var _color = color_char[_c, page];
-	draw_text_color(x - char_x[_c_clamped, page] + _x_offset, y - char_y[_c_clamped, page] + _y_offset, chars[page, _c_clamped], _color, _color, _color, _color, 1);
+	draw_set_font(font[_c, page]);
+	draw_text_transformed_color(x - char_x[_c_clamped, page] + _x_offset, y - char_y[_c_clamped, page] + _y_offset, chars[page, _c_clamped], size, size, 0, _color, _color, _color, _color, 1);
 }
 
-if(characters[page] != undefined) {
-	draw_sprite(characters[page], emotions[page], x - (background_width / 2) + margin_x, y - (background_height / 2) + margin_y);
+if(character != undefined) {
+	draw_sprite(character, emotion, x - (background_width / 2) + margin_x, y - (background_height / 2) + margin_y);
 }
 
-if(options[0] != undefined && text_index == text_lenghts[page] && page >= num_pages) {
-	var _col0 = option == 0 ? c_yellow : c_white;
-	var _col1 = option == 1 ? c_yellow : c_white;
-	var _x_soul_offset = option == 0 ? 0 : (background_width / 2) + 20;
-	draw_text_ext_color(x - (background_width / 2) + margin_x + (characters[page] != undefined ? 64 + margin_x : 0) + 50, y + (background_height / 2) - margin_y - 20, options[0].text, line_separation, background_width - (margin_x * 2) - (characters[page] != undefined ? 64 : 0), _col0, _col0, _col0, _col0, 1);	
-	draw_text_ext_color(x + margin_x + (characters[page] != undefined ? 64 + margin_x : 0) + 70, y + (background_height / 2) - margin_y - 20, options[1].text, line_separation, background_width - (margin_x * 2) - (characters[page] != undefined ? 64 : 0), _col1, _col1, _col1, _col1, 1);
-	draw_sprite_stretched(spr_soul, 1, x - (background_width / 2) + (characters[page] != undefined ? 64 : 0) + 40 + _x_soul_offset,  y + (background_height / 2) - margin_y - 25, 20, 23);
+if(array_length(options) > 0 && text_index == text_lenghts[page] && page >= num_pages) {
+	var _cols;
+	for(var _i = 0; _i < array_length(options); _i++) {
+		_cols[_i] = (option == _i ? c_yellow : c_white);
+	}
+	
+	var _x_pos;
+	var _y_pos;
+	for(var _i = 0; _i < array_length(options); _i++) {
+		switch(_i) {
+			case 0:
+				_x_pos = -200;
+				_y_pos = 20;
+				break;
+			case 1:
+				_x_pos = 170;
+				_y_pos = 20;
+				break;
+			case 2:
+				if(array_length(options) != 3) {
+					_x_pos = -200;
+					_y_pos = -10;
+				} else {
+					_x_pos = 0;
+					_y_pos = -40;
+				}
+				break;
+			case 3:
+				_x_pos = 170;
+				_y_pos = -10;
+				break;
+			case 4:
+				_x_pos = -200;
+				_y_pos = -40;
+				break;
+			case 5:
+				_x_pos = 170;
+				_y_pos = -40;
+				break;
+			default:
+				_x_pos = -240;
+				_y_pos = -48;
+				break;
+		}
+		draw_text_ext_color(x + _x_pos, y + _y_pos, options[_i].text, line_separation, background_width - (margin_x * 2) - (character != undefined ? 64 : 0), _cols[_i], _cols[_i], _cols[_i], _cols[_i], 1);
+		if(option == _i) {
+			draw_sprite_stretched(spr_soul, 1, x + _x_pos - 20,  y + _y_pos, 20, 23);
+		}
+	}
 }

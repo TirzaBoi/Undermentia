@@ -1,46 +1,69 @@
-/// @param dialogue_number
+/// @param dialogue_id
 /// @description Creates a new instance of a dialogue box
-function display_dialogue(_num){
-	dialogue = get_dialogue(_num);
+function display_dialogue(_id, _caller_instance) {
+	if(is_string(_id)) {
+		dialogue = get_dialogue_csv(_id);
+	} else {
+		dialogue = _id;
+	}
 	instance = instance_create_depth(0, 0, -9998, obj_dialogue_textbox);
 	instance.text = dialogue.text;
 	instance.text_speed = dialogue.txt_speed;
-	instance.font = dialogue.font;
+	instance.font[0, 0] = dialogue.font;
 	instance.next = dialogue.next;
-	instance.item = dialogue.item;
-	instance.play = dialogue.play;
-	instance.sound = dialogue.sound;
-	instance.loop = dialogue.loop;
-	instance.characters = dialogue.characters;
-	instance.emotions = dialogue.emotions;
 	instance.text_lenght = string_length(dialogue.text);
-	instance.options[0] = dialogue.option1;
-	instance.options[1] = dialogue.option2;
 	instance.auto = dialogue.auto;
-	instance.voices = dialogue.voices;
-	instance.colors = dialogue.colors;
-	instance.effects = dialogue.effects;
+	instance.caller = _caller_instance;
 }
 
-/// @param dialogue_number textbox_instance
+/// @param dialogue textbox_instance
 /// @description Adds a new dialogue into an existing dialogue box
-function display_dialogue_textbox(_num, _textbox){
-	dialogue = get_dialogue(_num);
+function display_dialogue_textbox(_num, _textbox, _caller_instance) {
+	if(is_string(_num)) {
+		dialogue = get_dialogue_csv(_num);
+	} else {
+		dialogue = _num;
+	}
 	_textbox.text = dialogue.text;
 	_textbox.text_speed = dialogue.txt_speed;
-	_textbox.font = dialogue.font;
+	_textbox.font[0, 0] = dialogue.font;
 	_textbox.next = dialogue.next;
-	_textbox.item = dialogue.item;
-	_textbox.play = dialogue.play;
-	_textbox.sound = dialogue.sound;
-	_textbox.loop = dialogue.loop;
-	_textbox.characters = dialogue.characters;
-	_textbox.emotions = dialogue.emotions;
 	_textbox.text_lenght = string_length(dialogue.text);
-	_textbox.options[0] = dialogue.option1;
-	_textbox.options[1] = dialogue.option2;
 	_textbox.auto = dialogue.auto;
-	_textbox.voices = dialogue.voices;
-	_textbox.colors = dialogue.colors;
-	_textbox.effects = dialogue.effects;
+	_textbox.caller = _caller_instance;
+}
+
+/// @param dialogue 
+/// @description Creates a new instance of a dialogue box with your dialogue
+function display_dialogue_custom(_id, _caller_instance) {
+	if(is_string(_id)) {
+		dialogue = get_dialogue_csv(_id);
+	} else {
+		dialogue = _id;
+	}
+	instance = instance_create_depth(0, 0, -9998, obj_dialogue_textbox);
+	instance.text = dialogue.text;
+	instance.text_speed = dialogue.txt_speed;
+	instance.font[0, 0] = dialogue.font;
+	instance.next = dialogue.next;
+	instance.text_lenght = string_length(dialogue.text);
+	instance.auto = dialogue.auto;
+	instance.caller = _caller_instance;
+}
+
+/// @param dialogue textbox_instance
+/// @description Adds your dialogue into an existing dialogue box
+function display_dialogue_textbox_custom(_num, _textbox, _caller_instance) {
+	if(is_string(_num)) {
+		dialogue = get_dialogue_csv(_num);
+	} else {
+		dialogue = _num;
+	}
+	_textbox.text = dialogue.text;
+	_textbox.text_speed = dialogue.txt_speed;
+	_textbox.font[0, 0] = dialogue.font;
+	_textbox.next = dialogue.next;
+	_textbox.text_lenght = string_length(dialogue.text);
+	_textbox.auto = dialogue.auto;
+	_textbox.caller = _caller_instance;
 }
