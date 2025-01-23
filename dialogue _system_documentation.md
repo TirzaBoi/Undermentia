@@ -1,6 +1,7 @@
 # DIALOGUE SYSTEM DOCUMENTATION
 
 This is a detailed explanation of the dialogue system used by this project. The system works on basis of a CSV file containing all the dialogue information needed. To access this information, use function ```get_dialogue_csv(string: dialogue_id)``` which returns a struct consisting of: ```string: text, real: txt_speed, string: next, bool: auto, instanceId: font```. To create a dialogue textbox with a selected text, use the function ```display_dialogue(string: dialogue_id, opt. InstanceId: creator_id)```. To reuse a dialogue textbox with a selected text, use the function ```display_dialogue_textbox(string: dialogue_id, instanceId: textbox_id, opt. InstanceId: creator_id)```. The creator id is used to send events(e.g. Dialogue options selection, custom event, etc.) back to the creating instance. You can also use a raw dialogue struct instead of the dialogue_id.
+To create a new dialogue page(same textbox, but a new dialogue), use `///`, and to force a new line, use `//`.
 
 ## Tags
 
@@ -44,19 +45,19 @@ This tag applies a selected font and size multiplier to the region.
 
 Parameters - font(object id), size(real)
 
+#### voice
+
+This tag makes the text play the specified voice when typing.
+
+Parameters - textbox id(real), position x(real), position y(real), width(real), height(real)
+
 ### Single
 
-#### play_sound - to be added
+#### play_sound - to be reworked
 
 This tag plays a sound.
 
 Parameters - sound to play(object id), looping(boolean)
-
-#### item - to be added
-
-This tag attempts to give/take an item to/from the player's inventory.
-
-Parameters - "give"/"take"(string), item(???), count(real)
 
 #### event
 
@@ -81,3 +82,15 @@ Parameters - option display name(string), dialogue address after selection(strin
 This tag makes the text use the selected version of the textbox, alongside with it's size and position.
 
 Parameters - textbox id(real), position x(real), position y(real), width(real), height(real)
+
+#### asterisk
+
+This tag toggles the pre-text asterisks.
+
+Parameters - enabled(bool)
+
+#### stop
+
+This tag stops the text typing for the specified amount of miliseconds.
+
+Parameters - miliseconds to wait(real)

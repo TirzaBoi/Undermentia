@@ -12,6 +12,10 @@ var _new_y = y + (_move_y * movement_speed * _delta);
 if (global.menu_open) {
 	is_moving = false;
 	return;
+} else if(global.in_dialogue) {
+	can_move = false;
+} else {
+	can_move = true;
 }
 
 #region Movement
@@ -21,8 +25,8 @@ if (global.menu_open) {
  * Inefficient, but basic and snappy. We can overhaul it later! */
  
 if (can_player_interact) {
-	if (!place_meeting(_new_x, y, collision_map)) x = _new_x;
-	if (!place_meeting(x, _new_y, collision_map)) y = _new_y;
+	if (!place_meeting(_new_x, y, collision_map) && can_move) x = _new_x;
+	if (!place_meeting(x, _new_y, collision_map) && can_move) y = _new_y;
 }
 
 
@@ -49,7 +53,7 @@ if (_move_x != 0 && can_move) {
 #region Interacting
 function can_interact() {
 	//TODO: Add checking conditions for interacting with objects (is in dialogue, etc...)	
-	return !in_dialogue;
+	return !(global.in_dialogue || global.menu_open);
 }
 var _x_offset = _move_x * collided_length;
 var _y_offset = _x_offset != 0 ? 0 : _move_y * collided_length;

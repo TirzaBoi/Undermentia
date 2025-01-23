@@ -42,14 +42,15 @@
     {"$GMFolder":"","%Name":"Timelines","folderPath":"folders/Timelines.yy","name":"Timelines","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
   "IncludedFiles":[
-    {"$GMIncludedFile":"","%Name":"csv.csv","CopyToMask":-1,"filePath":"datafiles","name":"csv.csv","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"DTM-Mono.otf","CopyToMask":-1,"filePath":"datafiles","name":"DTM-Mono.otf","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"en-us.csv","CopyToMask":-1,"filePath":"datafiles","name":"en-us.csv","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"full_room_names.json","CopyToMask":-1,"filePath":"datafiles","name":"full_room_names.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"testing.csv","CopyToMask":-1,"filePath":"datafiles","name":"testing.csv","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.6.2.162",
+    "IDEVersion":"2024.11.0.179",
   },
   "name":"Undermentia",
   "resources":[

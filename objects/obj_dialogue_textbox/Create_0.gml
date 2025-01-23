@@ -25,12 +25,21 @@ sound = undefined;
 loop = undefined;
 options = [];
 auto = false;
-voices = [sfx_talk_def];
+voice = sfx_talk_def;
 colors = [];
 color_char[0, 0] = #ffffff;
 caller = undefined;
 size = 1;
 base_size = 1;
+
+asterisk = true;
+forced_breaks_at = [];
+base_text_lengths = [];
+base_texts = [];
+base_chars = [];
+forced_line_breaks = [];
+
+timer = 0;
 
 effects = [];
 effect_char[0, 0] = [];
@@ -38,7 +47,7 @@ effect_char_params[0, 0] = [];
 
 page = 0;
 text_index = 0;
-text = "* If you're reading this, something went wrong. Please reset your game.";
+text = "If you're reading this, something went wrong. Please reset your game.";
 texts = [];
 text_lenght = 0;
 text_lenghts[0] = 0;
@@ -57,10 +66,7 @@ num_pages = 0;
 snd_delay = 3;
 snd_count = snd_delay;
 
-if(object_exists(obj_player)) {
-	obj_player.can_move = false;
-	obj_player.in_dialogue = true;
-}
+global.in_dialogue = true;
 
 tag_stack = [];
 tag_index_stack = [];
@@ -71,25 +77,70 @@ function calculate_letter_positions(_page) {
 	last_free_space = 0;
 	break_nums[_page] = 0;
 	break_offset = 0;
+	forced_breaks_at = [];
+	forced_line_breaks = [];
+	text_lenghts = [];
+	array_copy(text_lenghts, 0, base_text_lengths, 0, array_length(base_text_lengths));
+	texts = [];
+	array_copy(texts, 0, base_texts, 0, array_length(base_texts));
+	chars = [];
+	
+	for(var _a = 0; _a < array_length(base_chars); _a++) {
+		chars[_a] = [];
+		array_copy(chars[_a], 0, base_chars[_a], 0, array_length(base_chars[_a]));
+	}
+	forced_line_breaks[_page] = [0];
+	forced_breaks_at[_page] = [];
+	
+	var _decrease = 0;
+	var _dec_i = [];
+	for(var _i = 0; _i < text_lenghts[_page]; _i++) {
+		if(string_char_at(texts[_page], _i) == "/" && string_char_at(texts[_page], _i + 1) == "/") {
+			array_insert(forced_breaks_at[_page], array_length(forced_breaks_at[_page]), _i - 2);
+			_decrease += 2;
+			array_insert(_dec_i, 0, _i);
+		}
+	}
+	
+	text_lenghts[_page] -= _decrease;
+	for(var _i = 0; _i < array_length(_dec_i); _i++) {
+		texts[_page] = string_delete(texts[_page], _dec_i[_i], 2);
+		array_delete(chars[_page], _dec_i[_i] - 1, 2);
+	}
+	_decrease = 0;
+	_dec_i = [];
+	
 	for(var _c = 0; _c < text_lenghts[_page]; _c++) {
 		var _txt_w = (string_width(string_copy(texts[_page], 1, _c + 1)) * size) - (string_width(chars[_page, _c]) * size);
 	
 		if(chars[_page, _c] == " ") {
 			last_free_space = _c + 1;
 		}
+		for(var _j = 0; _j < array_length(forced_breaks_at[_page]); _j++) {
+			if(_c == forced_breaks_at[_page, _j]) {
+				last_free_space = _c + 1;
+				array_insert(forced_line_breaks[_page], array_length(forced_line_breaks[_page]), break_nums[_page] + 1);
 				
-		if(_txt_w - break_offset > background_width - (margin_x * 2) - (character != undefined ? 64 + margin_x : 0)) {
+				line_breaks[break_nums[_page], _page] = last_free_space;
+				break_nums[_page]++;
+				array_insert(forced_line_breaks[_page], array_length(forced_line_breaks[_page]), break_nums[_page]);
+				break_offset = string_width(string_copy(texts[_page], 1, last_free_space)) * size - string_width(string_char_at(texts[_page], last_free_space)) * size;
+				break;
+			}
+		}
+				
+		if(_txt_w - break_offset > background_width - (margin_x * 2) - (character != undefined ? 64 + margin_x : 0) - (asterisk ? string_width("*") * size + margin_x : 0)) {
 			line_breaks[break_nums[_page], _page] = last_free_space;
 			break_nums[_page]++;
-			break_offset = string_width(string_copy(texts[_page], 1, last_free_space)) - string_width(string_char_at(texts[_page], last_free_space));
+			break_offset = string_width(string_copy(texts[_page], 1, last_free_space)) * size - string_width(string_char_at(texts[_page], last_free_space)) * size;
 		}
 	}
 }
 
 function set_letter_positions(_page) {
 	for(var _c = 0; _c < text_lenghts[_page]; _c++) {
-		var _txt_x = (background_width / 2) - (character != undefined ? 64 + margin_x : 0) - margin_x + pos_x - 320;
-		var _txt_y = (background_height / 2) - margin_y + pos_y - 288;
+		var _txt_x = (background_width / 2) - (character != undefined ? 64 + margin_x : 0) - (asterisk ? string_width("*") * size + margin_x : 0) - margin_x;
+		var _txt_y = (background_height / 2) - margin_y;
 		
 		var _txt_w = (string_width(string_copy(texts[_page], 1, _c + 1)) * size) - (string_width(chars[_page, _c]) * size);
 		var _line = 0;
@@ -183,21 +234,12 @@ function process_tag(_end_index, _page, _start_tag, _start_index, _start_lenght)
 				page : _page
 			});
 			break;
-		case "item":
-			array_insert(effects, 0, {
-				start : _start_index,
-				effect : "item",
-				params : [_start_tag[1], asset_get_index(_start_tag[2]), real(_start_tag[3])],
-				end_pos : _end_index - 2,
-				page : _page
-			});
-			break;
 		case "event":
 			array_insert(effects, 0, {
 				start : _start_index,
 				effect : "event",
 				params : [_start_tag[1]],
-				end_pos : _end_index - 2,
+				end_pos : _start_index,
 				page : _page
 			});
 			break;
@@ -245,6 +287,36 @@ function process_tag(_end_index, _page, _start_tag, _start_index, _start_lenght)
 				end_pos : _end_index - 2,
 				page : _page
 			});
+			break;
+		case "asterisks":
+			array_insert(effects, 0, {
+				start : _start_index,
+				effect : "asterisks",
+				params : bool(_start_tag[1]),
+				end_pos : _start_index,
+				page : _page
+			});
+			break;
+		case "stop":
+			array_insert(effects, 0, {
+				start : _start_index,
+				effect : "stop",
+				params : real(_start_tag[1]),
+				end_pos : _start_index,
+				page : _page
+			});
+			break;
+		case "voice":
+			array_insert(effects, 0, {
+				start : _start_index,
+				effect : "voice",
+				params : asset_get_index(_start_tag[1]),
+				end_pos : _end_index - 2,
+				page : _page
+			});
+			break;
+		default:
+			show_debug_message($"{_start_tag[0]} is not a valid tag. Please use one of the tags listed in the documentation.");
 			break;
 	}
 }

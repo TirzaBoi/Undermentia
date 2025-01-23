@@ -1,4 +1,4 @@
-in_dialogue = false;
+global.in_dialogue = false;
 
 #region Movement & Collision 
 

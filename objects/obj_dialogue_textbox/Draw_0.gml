@@ -17,19 +17,20 @@ if(!setup) {
 	var _num_chars = 0;
 	for(var _c = 0; _c < text_lenght; _c++) {
 		var _char = string_char_at(text, _c + 1);
-		if((_char != "/" || string_char_at(text, _c) != "/") && (_char != "/" || string_char_at(text, _c + 2) != "/")) {
-			chars[_p, _c - _last_i] = _char;
-			_num_chars++;
-		} else if(_char == "/" && string_char_at(text, _c) == "/") {
+		if(_char == "/" && string_char_at(text, _c) == "/" && string_char_at(text, _c - 1) == "/") {
 			_last_i = _c + 1;
-			text_lenghts[_p] = _num_chars;
+			array_delete(chars[_p], array_length(chars[_p]) - 2, 2);
+			text_lenghts[_p] = _num_chars - 2;
 			_num_chars = 0;
 			_p++;
 			num_pages++;
+		} else {
+			chars[_p, _c - _last_i] = _char;
+			_num_chars++;
 		}
 	}
 	text_lenghts[_p] = _num_chars;
-
+	
 	for(var _page = 0; _page <= num_pages; _page++) {
 		var _string = "";
 		for(var _c = 0; _c < text_lenghts[_page]; _c++) {
@@ -96,7 +97,7 @@ if(!setup) {
 				_delete_stack[array_length(_delete_stack)] = [_c, _end_pos];
 			}
 		}
-		for(var _x = array_length(tag_stack) - 1; _x >= 0; _x--;) {
+		for(var _x = array_length(tag_stack) - 1; _x >= 0; _x--) {
 			var _start_tag = tag_stack[_x];
 			var _index = tag_index_stack[_x];
 			var _start = tag_start_stack[_x];
@@ -112,7 +113,6 @@ if(!setup) {
 				}
 			}
 			process_tag(text_lenghts[_page], _page, _start_tag, _start, _len);
-			break;
 		}
 		for(var _t = array_length(_delete_stack) - 1; _t >= 0; _t--) {
 			array_delete(chars[_page], _delete_stack[_t][0], _delete_stack[_t][1] - _delete_stack[_t][0]);
@@ -121,6 +121,16 @@ if(!setup) {
 		text_lenghts[_page] -= _total_text_shortage;
 		_delete_stack = [];
 		_total_text_shortage = 0;
+	}
+	
+	base_texts = [];
+	array_copy(base_texts, 0, texts, 0, array_length(texts));
+	base_text_lengths = [];
+	array_copy(base_text_lengths, 0, text_lenghts, 0, array_length(text_lenghts));
+	base_chars = [];
+	for(var _a = 0; _a < array_length(chars); _a++) {
+		base_chars[_a] = [];
+		array_copy(base_chars[_a], 0, chars[_a], 0, array_length(chars[_a]));
 	}
 	
 	for(var _page = 0; _page <= num_pages; _page++) {
@@ -133,7 +143,6 @@ if(!setup) {
 					color_char[_c, _page] = colors[_i].start <= _c && colors[_i].end_pos >= _c ? colors[_i].col : color_char[_c, _page];
 				}
 			}
-
 			effect_char[_c, _page] = [];
 			effect_char_params[_c, _page] = {};
 			for(var _i = 0; _i < array_length(effects); _i++) {
@@ -155,8 +164,11 @@ if(!setup) {
 							case "play_sound":
 								effect_char_params[_c, _page].play_sound = effects[_i].params;
 								break;
-							case "item":
-								effect_char_params[_c, _page].item = effects[_i].params;
+							case "asterisks":
+								effect_char_params[_c, _page].asterisks = effects[_i].params;
+								break;
+							case "stop":
+								effect_char_params[_c, _page].stop = effects[_i].params;
 								break;
 							case "event":
 								if(effects[_i].start == _c) {
@@ -180,28 +192,30 @@ if(!setup) {
 							case "font":
 								effect_char_params[_c, _page].font = effects[_i].params;
 								break;
+							case "voice":
+								effect_char_params[_c, _page].voice = effects[_i].params;
+								break;
 						}
 					}
 				}
 			}
 		}
 	}
-	
 	for(var _page = 0; _page <= num_pages; _page++) {
 		set_letter_positions(_page);
 	}
 }
-
-if(text_index < text_lenghts[page] && txt_timer <= 0) {
-	text_index += text_speed;
-	text_index = check_return_pressed() ? text_lenghts[page] : text_index;
+if(timer > current_time) {
+	
+} else if(text_index < text_lenghts[page] && txt_timer <= 0) {
+	text_index = check_return_pressed() ? text_lenghts[page] : text_index + text_speed;
 	text_index = clamp(text_index, 0, text_lenghts[page]);
 	
 	if(snd_count < snd_delay) {
 		snd_count++;
 	} else if(last_char != floor(text_index)) {
 		snd_count = 0;
-		audio_play_sound(voices[page], 0, false);
+		audio_play_sound(voice, 0, false);
 	}
 	
 	var _curr_char = string_char_at(texts[page], text_index + 1);
@@ -216,14 +230,16 @@ if(text_index < text_lenghts[page] && txt_timer <= 0) {
 	if(page >= num_pages) {
 		if(next == undefined) {
 			if(array_length(options) <= 0) {
-				if(object_exists(obj_player)) {
-					obj_player.in_dialogue = false;
-					obj_player.can_move = true;
-				}
+				global.in_dialogue = false;
 				instance_destroy();
 			} else {
 				if(caller != undefined && variable_instance_exists(caller, "dialogue_message_cache")) {
 					array_insert(caller.dialogue_message_cache, array_length(caller.dialogue_message_cache), option);
+				}
+				show_debug_message($"{options}  {option}")
+				if(options[option].next == "undefined") {
+					global.in_dialogue = false;
+					instance_destroy();
 				}
 				text_index = 0;
 				setup = false;
@@ -275,6 +291,7 @@ for(var _c = 0; _c < min(text_index, text_lenghts[page]); _c++) {
 	font[_c, page] = base_font;
 	size = base_size;
 	if(array_length(effect_char[_c, page]) != 0) {
+		var _delete = [];
 		for(var _i = 0; _i < array_length(effect_char[_c, page]); _i++) {
 			if(array_contains(effect_char[text_index - 1, page], "text_speed")) {
 				text_speed = effect_char_params[text_index - 1, page].text_speed;
@@ -289,14 +306,23 @@ for(var _c = 0; _c < min(text_index, text_lenghts[page]); _c++) {
 				font[_c, page] = effect_char_params[_c, page].font[0];
 				size = effect_char_params[_c, page].font[1];
 			}
+			if(effect_char[_c, page][_i] == "voice") {
+				voice = effect_char_params[_c, page].voice;
+			} else {
+				voice = sfx_talk_def;
+			}
 			if(effect_char[_c, page][_i] == "event") {
 				if(caller != undefined && variable_instance_exists(caller, "dialogue_message_cache")) {
 					array_insert(caller.dialogue_message_cache, array_length(caller.dialogue_message_cache), effect_char_params[_c, page].evento[0]);
 				}
-				array_delete(effect_char[_c, page], _i, 1);
+				array_insert(_delete, 0, _i);
 			}
 			if(array_contains(effect_char[text_index - 1, page], "auto")) {
 				auto = effect_char_params[text_index - 1, page].auto;
+			}
+			if(effect_char[_c, page][_i] == "stop" && _c >= text_index - 2) {
+				timer = current_time + effect_char_params[_c, page].stop;
+				array_insert(_delete, 0, _i);
 			}
 			if(array_contains(effect_char[_c, page], "options") && array_length(options) == 0) {
 				var _array = [];
@@ -314,6 +340,10 @@ for(var _c = 0; _c < min(text_index, text_lenghts[page]); _c++) {
 			} else {
 				character = undefined;
 			}
+			if(effect_char[_c, page][_i] == "asterisks") {
+				asterisk = effect_char_params[_c, page].asterisks;
+				array_insert(_delete, 0, _i);
+			}
 			if(array_contains(effect_char[text_index - 1, page], "textbox")) {
 				image_index = effect_char_params[text_index - 1, page].textbox[0];
 				if(effect_char_params[text_index - 1, page].textbox[1] != undefined) {
@@ -326,12 +356,24 @@ for(var _c = 0; _c < min(text_index, text_lenghts[page]); _c++) {
 				}
 			}
 		}
+		
+		for(var _del = 0; _del < array_length(_delete); _del++) {
+			array_delete(effect_char[_c, page], _delete[_del], 1);
+		}
+		_delete = [];
 		calculate_letter_positions(page);
 		set_letter_positions(page);
 	}
 	var _color = color_char[_c, page];
 	draw_set_font(font[_c, page]);
 	draw_text_transformed_color(x - char_x[_c_clamped, page] + _x_offset, y - char_y[_c_clamped, page] + _y_offset, chars[page, _c_clamped], size, size, 0, _color, _color, _color, _color, 1);
+
+	if(asterisk && array_length(forced_line_breaks) > page && array_length(forced_line_breaks[page]) > 0) {
+		for(var _break = 0; _break < array_length(forced_line_breaks[page]); _break++) {
+			var _x_off = -(background_width / 2) + (character != undefined ? 64 + margin_x : 0) + margin_x;
+			draw_text_transformed_color(x + _x_off, y + line_separation * forced_line_breaks[page, _break] * size - (background_height / 2) + margin_y, "*", size, size, 0, _color, _color, _color, _color, 1);
+		}
+	}
 }
 
 if(character != undefined) {
