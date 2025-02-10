@@ -30,7 +30,10 @@
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
   "solid":false,
-  "spriteId":null,
+  "spriteId":{
+    "name":"spr_fade",
+    "path":"sprites/spr_fade/spr_fade.yy",
+  },
   "spriteMaskId":null,
   "visible":true,
 }

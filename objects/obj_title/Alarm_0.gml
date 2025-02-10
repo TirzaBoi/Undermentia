@@ -1,5 +1,5 @@
 /// @description Automatically displays the story
 if(image_index < frame_count) {
-	instance_create_depth(0, 0, 9999, obj_fadein);
+	fade_inout(70, c_black, x, y);
 	alarm_set(1, 30);
 }

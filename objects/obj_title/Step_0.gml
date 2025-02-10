@@ -1,7 +1,7 @@
 if(room == rm_title) {
 	show_debug_message(image_index);
 	if(image_index < frame_count && !alarm_is_set) {
-		alarm_set(0, 30);
+		alarm_set(0, 300);
 		alarm_is_set = true;
 	}
 	
@@ -10,6 +10,7 @@ if(room == rm_title) {
 			image_index = frame_count;
 			alarm[0] = -1;
 			alarm[1] = -1;
+			audio_stop_all();
 		} else {
 			room_goto(rm_testbed);
 		}
