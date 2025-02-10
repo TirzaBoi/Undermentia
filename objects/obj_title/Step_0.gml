@@ -7,6 +7,7 @@ if(room == rm_title) {
 	
 	if(check_confirm_pressed()) {
 		if(image_index < frame_count) {
+			show_debug_message("image index set")
 			image_index = frame_count;
 			alarm[0] = -1;
 			alarm[1] = -1;

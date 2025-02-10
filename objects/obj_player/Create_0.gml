@@ -41,7 +41,7 @@ collision_map = layer_tilemap_get_id("Collision");
 #endregion
 
 #region Loading
-var _gm = instance_create_layer(0, 0, "Core", obj_gm);
+var _gm = instance_create_layer(0, 0, "Core", obj_globalmanager);
 _gm.load("rm_testbed");
 #endregion
 

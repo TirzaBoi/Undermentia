@@ -1,4 +1,4 @@
-frame_count = 7;
+frame_count = 5;
 alarm_is_set = false;
 
 //display_dialogue("title_screen_cutscene", self);
