@@ -1,0 +1,25 @@
+{
+  "$GMSound":"",
+  "%Name":"snd_fall_down_a_hole",
+  "audioGroupId":{
+    "name":"audiogroup_default",
+    "path":"audiogroups/audiogroup_default",
+  },
+  "bitDepth":1,
+  "bitRate":128,
+  "compression":0,
+  "conversionMode":0,
+  "duration":1.123265,
+  "name":"snd_fall_down_a_hole",
+  "parent":{
+    "name":"SFX",
+    "path":"folders/Sounds/SFX.yy",
+  },
+  "preload":false,
+  "resourceType":"GMSound",
+  "resourceVersion":"2.0",
+  "sampleRate":44100,
+  "soundFile":"snd_fall_down_a_hole.mp3",
+  "type":0,
+  "volume":0.9,
+}

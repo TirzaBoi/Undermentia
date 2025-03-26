@@ -6,15 +6,15 @@ draw_self();
 /* Debug Setting; Will be incorporated into a debug mode at a later date!*/
 
 draw_set_color(c_red);
-if (dir == DIRECTION.UP) { // Up
+if (global.dir == DIRECTION.UP) { // Up
 	draw_line(x, y, x, y - collided_length)	
 }
-if (dir == DIRECTION.RIGHT) { // Right
+if (global.dir == DIRECTION.RIGHT) { // Right
 	draw_line(x, y, x + collided_length, y)	
 }
-if (dir == DIRECTION.DOWN) { // Down
+if (global.dir == DIRECTION.DOWN) { // Down
 	draw_line(x, y, x, y + collided_length)	
 }
-if (dir == DIRECTION.LEFT) { // Left
+if (global.dir == DIRECTION.LEFT) { // Left
 	draw_line(x, y, x - collided_length, y)	
 }

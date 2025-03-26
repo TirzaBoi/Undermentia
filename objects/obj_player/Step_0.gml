@@ -11,8 +11,9 @@ var _new_y = y + (_move_y * movement_speed * _delta);
 // stops player from moving when menu is open
 if (global.menu_open) {
 	is_moving = false;
+	image_index = animation_frames[0];
 	return;
-} else if(global.in_dialogue) {
+} else if(global.in_dialogue or global._isFalling) {
 	can_move = false;
 } else {
 	can_move = true;
@@ -37,15 +38,43 @@ if (keyboard_check(vk_tab)) {
 // Set Direction & Get Animation
 if (_move_x != 0 && can_move) {
 	is_moving = true;
-	dir = (_move_x > 0) ? DIRECTION.RIGHT : DIRECTION.LEFT;
-	get_animation((_move_x > 0) ? "right" : "left");
+	global.dir = (_move_x > 0) ? DIRECTION.RIGHT : DIRECTION.LEFT;
 } else if (_move_y != 0 && can_move) {
 	is_moving = true;
-	dir = (_move_y > 0) ? DIRECTION.DOWN : DIRECTION.UP;
-	get_animation((_move_y > 0) ? "down" : "up");
+	global.dir = (_move_y > 0) ? DIRECTION.DOWN : DIRECTION.UP;
 } else {
 	is_moving = false;
 	image_index = animation_frames[0]; // Sets the appropriate idle animation
+}
+
+// Set directions animation (changed to make falling work)
+if(global.dir == DIRECTION.UP) {
+	get_animation("up");
+} else if(global.dir == DIRECTION.RIGHT) {
+	get_animation("right");
+} else if(global.dir == DIRECTION.DOWN) {
+	get_animation("down");
+} else if(global.dir == DIRECTION.LEFT) {
+	get_animation("left");
+}
+
+// If falling, fall (wow)
+if(global._isFalling) {
+	y += 0.000125 * delta_time
+	
+	if(fallFrame == 5) {
+		 if(global.dir == DIRECTION.UP) {
+			 global.dir = DIRECTION.RIGHT
+		 } else if(global.dir == DIRECTION.RIGHT) {
+			 global.dir = DIRECTION.DOWN
+		 } else if(global.dir == DIRECTION.DOWN) {
+			 global.dir = DIRECTION.LEFT
+		 } else if(global.dir == DIRECTION.LEFT) {
+		 global.dir = DIRECTION.UP
+		 }
+		 fallFrame = 0
+	 }
+	 fallFrame += 1
 }
 
 #endregion
